@@ -57,7 +57,16 @@
           {
             "group": "Pix",
             "pages": [
-              "api-reference/endpoint/create"
+              "api-reference/endpoint/create.mdx"
+            ]
+          },
+          {
+            "group": "Crypto",
+            "pages": [
+              {
+                "group": "Solana",
+                "pages": []
+              }
             ]
           }
         ],
