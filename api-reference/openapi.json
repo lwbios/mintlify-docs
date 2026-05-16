@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Valora API",
+    "description": "API de pagamentos cripto via PIX e Solana Pay. Permite criar cobranças, monitorar transações e receber notificações via webhook.",
     "license": {
       "name": "MIT"
     },
@@ -10,85 +10,272 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://prod.api.valora.cash",
+      "description": "Produção"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Desenvolvimento"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "apiKeyAuth": []
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/v1/pixQrCode": {
+      "post": {
+        "summary": "Criar cobrança PIX",
+        "description": "Gera um QR Code PIX para o usuário pagar em BRL e receber crypto na carteira Solana.",
+        "tags": ["PIX"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PixQrCodeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Cobrança criada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PixQrCodeResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "429": { "$ref": "#/components/responses/RateLimitError" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/v1/coins/sol": {
+      "post": {
+        "summary": "Criar pagamento em SOL nativo",
+        "description": "Gera um pagamento Solana Pay para receber SOL nativo. O valor em SOL é calculado automaticamente pelo câmbio SOL/BRL em tempo real.",
+        "tags": ["Crypto"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CryptoPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pagamento criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CryptoPaymentResponse"
+                },
+                "example": {
+                  "id": "pay_a1b2c3d4",
+                  "status": "pending",
+                  "network": "sol",
+                  "asset": {
+                    "symbol": "SOL",
+                    "mint": "native",
+                    "decimals": 9
+                  },
+                  "amount": {
+                    "brl": 50.00,
+                    "sol": 0.123456789
+                  },
+                  "exchangeRate": {
+                    "sol_brl": 850.00
+                  },
+                  "address": {
+                    "deposit": "BJ26ofuuKFJwvBmwiN2mSUeBiNEUhi5xjSkAockDA86q",
+                    "paymentUrl": "solana:BJ26ofuu...?amount=0.123&reference=xxx&label=Valora",
+                    "qrCode": "data:image/png;base64,..."
+                  },
+                  "reference": "3vt2TCSAAQxyz...",
+                  "expiresAt": "2026-05-16T21:30:00.000Z",
+                  "createdAt": "2026-05-16T21:00:00.000Z"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "429": { "$ref": "#/components/responses/RateLimitError" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/v1/coins/sol/{asset}": {
+      "post": {
+        "summary": "Criar pagamento em SPL Token (USDT / USDC)",
+        "description": "Gera um pagamento Solana Pay para receber USDT ou USDC. O valor em token é calculado automaticamente pelo câmbio USD/BRL em tempo real.",
+        "tags": ["Crypto"],
         "parameters": [
           {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
+            "name": "asset",
+            "in": "path",
+            "required": true,
+            "description": "Token SPL a receber",
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "enum": ["usdt", "usdc"]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CryptoPaymentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pagamento criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CryptoPaymentResponse"
+                },
+                "example": {
+                  "id": "pay_a1b2c3d4",
+                  "status": "pending",
+                  "network": "sol",
+                  "asset": {
+                    "symbol": "USDT",
+                    "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+                    "decimals": 6
+                  },
+                  "amount": {
+                    "brl": 50.00,
+                    "usdt": 9.123456
+                  },
+                  "exchangeRate": {
+                    "usd_brl": 5.48
+                  },
+                  "address": {
+                    "deposit": "BJ26ofuuKFJwvBmwiN2mSUeBiNEUhi5xjSkAockDA86q",
+                    "paymentUrl": "solana:BJ26ofuu...?amount=9.12&spl-token=Es9vMF...&reference=xxx",
+                    "qrCode": "data:image/png;base64,..."
+                  },
+                  "reference": "3vt2TCSAAQxyz...",
+                  "expiresAt": "2026-05-16T21:30:00.000Z",
+                  "createdAt": "2026-05-16T21:00:00.000Z"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "429": { "$ref": "#/components/responses/RateLimitError" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/v1/coins/sol/{asset}/{txid}": {
+      "get": {
+        "summary": "Consultar status de pagamento crypto",
+        "description": "Verifica se um pagamento Solana foi confirmado na blockchain. Retorna 200 se confirmado, 202 se ainda pendente. Consulta primeiro o store em memória (instantâneo) e faz fallback no RPC da Solana se o servidor tiver reiniciado.",
+        "tags": ["Crypto"],
+        "parameters": [
+          {
+            "name": "asset",
+            "in": "path",
+            "required": true,
+            "description": "Token do pagamento",
+            "schema": {
+              "type": "string",
+              "enum": ["usdt"]
+            }
+          },
+          {
+            "name": "txid",
+            "in": "path",
+            "required": true,
+            "description": "O campo `reference` retornado na criação do pagamento",
+            "schema": {
+              "type": "string"
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Pagamento confirmado",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/ConfirmResponse"
+                },
+                "example": {
+                  "confirmed": true,
+                  "transaction": {
+                    "signature": "5KtPn1...",
+                    "slot": 123456789,
+                    "blockTime": 1747434000,
+                    "confirmedAt": "2026-05-16T21:00:00.000Z",
+                    "status": "finalized",
+                    "asset": "usdt",
+                    "from": "8S6GsXwSXE...",
+                    "to": "BJ26ofuuKF...",
+                    "amount": 9.123456,
+                    "feeSOL": 0.000005,
+                    "explorerUrl": "https://solscan.io/tx/5KtPn1..."
                   }
                 }
               }
             }
           },
-          "400": {
-            "description": "Unexpected error",
+          "202": {
+            "description": "Pagamento ainda pendente",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ConfirmResponse"
+                },
+                "example": {
+                  "confirmed": false,
+                  "transaction": null
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
           },
-          "required": true
-        },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "422": { "$ref": "#/components/responses/ValidationError" },
+          "429": { "$ref": "#/components/responses/RateLimitError" },
+          "500": { "$ref": "#/components/responses/InternalError" }
+        }
+      }
+    },
+    "/v1/help/transactions": {
+      "get": {
+        "summary": "Referência de erros e falhas em transações",
+        "description": "Retorna a lista completa de códigos de erro, causas e soluções para problemas comuns em transações PIX e crypto. Não requer autenticação.",
+        "tags": ["Utilitários"],
+        "security": [],
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Referência de erros agrupada por categoria",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ErrorReferenceResponse"
                 }
               }
             }
@@ -96,33 +283,61 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/v1/pix/webhook": {
+      "get": {
+        "summary": "Ping do webhook PIX (Efi Bank)",
+        "description": "Endpoint exclusivo para verificação da Efi Bank ao registrar o webhook. Não use diretamente.",
+        "tags": ["Interno"],
+        "security": [],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "token",
+            "in": "query",
             "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
+            "description": "Secret do webhook (EFI_WEBHOOK_SECRET)",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Ping aceito",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
+                "schema": { "$ref": "#/components/schemas/OkResponse" }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      },
+      "post": {
+        "summary": "Notificação de PIX confirmado (Efi Bank)",
+        "description": "Recebido automaticamente pela Efi Bank quando um pagamento PIX é confirmado. Não use diretamente.",
+        "tags": ["Interno"],
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "required": true,
+            "description": "Secret do webhook (EFI_WEBHOOK_SECRET)",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/EfiWebhookBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sempre retorna 200 para evitar retentativas da Efi",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OkResponse" }
               }
             }
           }
@@ -131,86 +346,480 @@
     }
   },
   "webhooks": {
-    "/plant/webhook": {
+    "payment.created": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Pagamento criado",
+        "description": "Disparado quando um QR Code PIX ou pagamento crypto é gerado com sucesso.",
+        "tags": ["Webhooks"],
         "requestBody": {
-          "description": "Plant added to the store",
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
+              "schema": { "$ref": "#/components/schemas/WebhookPaymentCreated" }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+          "200": { "description": "Webhook recebido com sucesso" }
+        }
+      }
+    },
+    "payment.confirmed": {
+      "post": {
+        "summary": "Pagamento confirmado",
+        "description": "Disparado quando um PIX é confirmado pela Efi Bank ou uma transação crypto é detectada na blockchain.",
+        "tags": ["Webhooks"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/WebhookPaymentConfirmed" }
+            }
           }
+        },
+        "responses": {
+          "200": { "description": "Webhook recebido com sucesso" }
+        }
+      }
+    },
+    "payment.expired": {
+      "post": {
+        "summary": "Pagamento expirado",
+        "description": "Disparado quando um pagamento crypto não é confirmado dentro dos 30 minutos.",
+        "tags": ["Webhooks"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/WebhookPaymentExpired" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Webhook recebido com sucesso" }
+        }
+      }
+    },
+    "payment.failed": {
+      "post": {
+        "summary": "Pagamento falhou",
+        "description": "Disparado quando uma transação on-chain falha (ex: SOL insuficiente para taxa) ou a carteira do usuário não é encontrada após confirmação PIX.",
+        "tags": ["Webhooks"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/WebhookPaymentFailed" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Webhook recebido com sucesso" }
         }
       }
     }
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "PixQrCodeRequest": {
+        "required": ["amount", "network", "token"],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "amount": {
+            "type": "number",
+            "description": "Valor em BRL. Mínimo: 1.00",
+            "minimum": 1,
+            "example": 50.00
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "network": {
+            "type": "string",
+            "description": "Rede de destino",
+            "enum": ["solana"],
+            "example": "solana"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token de destino",
+            "enum": ["usdt"],
+            "example": "usdt"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "PixQrCodeResponse": {
+        "type": "object",
+        "properties": {
+          "txid": {
+            "type": "string",
+            "description": "ID da cobrança na Efi Bank"
           },
-          {
-            "required": [
-              "id"
-            ],
+          "status": {
+            "type": "string",
+            "description": "Status da cobrança",
+            "example": "ATIVA"
+          },
+          "pix": {
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
+              "qrCode": {
+                "type": "string",
+                "description": "QR Code em base64 (data:image/png;base64,...)"
+              },
+              "copyPaste": {
+                "type": "string",
+                "description": "Código PIX copia e cola"
+              },
+              "expiresIn": {
                 "type": "integer",
-                "format": "int64"
+                "description": "Tempo de expiração em segundos",
+                "example": 1800
+              },
+              "expiresAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Timestamp de expiração"
+              }
+            }
+          },
+          "payment": {
+            "type": "object",
+            "properties": {
+              "amountBRL": { "type": "number", "example": 50.00 },
+              "network": { "type": "string", "example": "solana" },
+              "token": { "type": "string", "example": "USDT" },
+              "amountToken": { "type": "number", "example": 9.123456 },
+              "usdBrlRate": { "type": "number", "example": 5.48 }
+            }
+          }
+        }
+      },
+      "CryptoPaymentRequest": {
+        "required": ["amount"],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Valor em BRL. Mínimo: 1.00",
+            "minimum": 1,
+            "example": 50.00
+          }
+        }
+      },
+      "CryptoPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "ID interno do pagamento (pay_xxxxxxxx)",
+            "example": "pay_a1b2c3d4"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pending"],
+            "example": "pending"
+          },
+          "network": {
+            "type": "string",
+            "example": "sol"
+          },
+          "asset": {
+            "type": "object",
+            "properties": {
+              "symbol": { "type": "string", "example": "USDT" },
+              "mint": { "type": "string", "example": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB" },
+              "decimals": { "type": "integer", "example": 6 }
+            }
+          },
+          "amount": {
+            "type": "object",
+            "description": "Chave dinâmica com o símbolo do asset em lowercase (ex: usdt, usdc, sol)",
+            "properties": {
+              "brl": { "type": "number", "example": 50.00 }
+            },
+            "additionalProperties": { "type": "number" }
+          },
+          "exchangeRate": {
+            "type": "object",
+            "description": "usd_brl para tokens SPL, sol_brl para SOL nativo",
+            "additionalProperties": { "type": "number" },
+            "example": { "usd_brl": 5.48 }
+          },
+          "address": {
+            "type": "object",
+            "properties": {
+              "deposit": {
+                "type": "string",
+                "description": "Carteira escrow que recebe todos os pagamentos",
+                "example": "BJ26ofuuKFJwvBmwiN2mSUeBiNEUhi5xjSkAockDA86q"
+              },
+              "paymentUrl": {
+                "type": "string",
+                "description": "URL Solana Pay — abra numa carteira compatível"
+              },
+              "qrCode": {
+                "type": "string",
+                "description": "QR Code do paymentUrl em base64"
+              }
+            }
+          },
+          "reference": {
+            "type": "string",
+            "description": "Referência bs58 (~44 chars) usada para monitorar o pagamento. Passe em GET /v1/coins/sol/:asset/:txid"
+          },
+          "expiresAt": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ConfirmResponse": {
+        "type": "object",
+        "properties": {
+          "confirmed": {
+            "type": "boolean"
+          },
+          "transaction": {
+            "nullable": true,
+            "type": "object",
+            "properties": {
+              "signature": { "type": "string", "description": "Assinatura da transação Solana (~88 chars)" },
+              "slot": { "type": "integer" },
+              "blockTime": { "type": "integer", "description": "Unix timestamp" },
+              "confirmedAt": { "type": "string", "format": "date-time" },
+              "status": { "type": "string", "enum": ["confirmed", "finalized"] },
+              "asset": { "type": "string", "example": "usdt" },
+              "from": { "type": "string", "description": "Endereço Solana do pagador" },
+              "to": { "type": "string", "description": "Endereço Solana do destinatário" },
+              "amount": { "type": "number", "example": 9.123456 },
+              "feeSOL": { "type": "number", "example": 0.000005 },
+              "explorerUrl": { "type": "string", "example": "https://solscan.io/tx/..." }
+            }
+          }
+        }
+      },
+      "WebhookBase": {
+        "type": "object",
+        "properties": {
+          "event": { "type": "string" },
+          "timestamp": { "type": "string", "format": "date-time" },
+          "data": { "type": "object" }
+        }
+      },
+      "WebhookPaymentCreated": {
+        "allOf": [
+          { "$ref": "#/components/schemas/WebhookBase" },
+          {
+            "type": "object",
+            "properties": {
+              "event": { "type": "string", "enum": ["payment.created"] },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["pix", "crypto"] },
+                  "asset": { "type": "string", "example": "usdt" },
+                  "txid": { "type": "string", "description": "Apenas para type=pix" },
+                  "id": { "type": "string", "description": "Apenas para type=crypto (pay_xxxxxxxx)" },
+                  "reference": { "type": "string", "description": "Apenas para type=crypto" },
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "brl": { "type": "number" },
+                      "usdt": { "type": "number" }
+                    }
+                  },
+                  "exchangeRate": { "type": "object", "additionalProperties": { "type": "number" } },
+                  "expiresAt": { "type": "string", "format": "date-time" }
+                }
               }
             }
           }
         ]
       },
+      "WebhookPaymentConfirmed": {
+        "allOf": [
+          { "$ref": "#/components/schemas/WebhookBase" },
+          {
+            "type": "object",
+            "properties": {
+              "event": { "type": "string", "enum": ["payment.confirmed"] },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["pix", "crypto"] },
+                  "asset": { "type": "string", "example": "usdt" },
+                  "reference": { "type": "string" },
+                  "endToEndId": { "type": "string", "description": "Apenas para type=pix" },
+                  "signature": { "type": "string", "description": "Apenas para type=crypto" },
+                  "amount": {
+                    "type": "object",
+                    "properties": {
+                      "brl": { "type": "number", "description": "Apenas para type=pix" },
+                      "gross": { "type": "number" },
+                      "fee": { "type": "number" },
+                      "net": { "type": "number" }
+                    }
+                  },
+                  "feePct": { "type": "number", "example": 0.01 },
+                  "confirmedAt": { "type": "string", "format": "date-time" },
+                  "explorerUrl": { "type": "string", "description": "Apenas para type=crypto" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "WebhookPaymentExpired": {
+        "allOf": [
+          { "$ref": "#/components/schemas/WebhookBase" },
+          {
+            "type": "object",
+            "properties": {
+              "event": { "type": "string", "enum": ["payment.expired"] },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["crypto"] },
+                  "asset": { "type": "string" },
+                  "reference": { "type": "string" },
+                  "expiresAt": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "WebhookPaymentFailed": {
+        "allOf": [
+          { "$ref": "#/components/schemas/WebhookBase" },
+          {
+            "type": "object",
+            "properties": {
+              "event": { "type": "string", "enum": ["payment.failed"] },
+              "data": {
+                "type": "object",
+                "properties": {
+                  "type": { "type": "string", "enum": ["pix", "crypto"] },
+                  "asset": { "type": "string" },
+                  "reference": { "type": "string" },
+                  "reason": {
+                    "type": "string",
+                    "enum": ["transaction_failed_on_chain", "wallet_not_found"]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "EfiWebhookBody": {
+        "type": "object",
+        "properties": {
+          "pix": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "txid": { "type": "string" },
+                "endToEndId": { "type": "string" },
+                "valor": { "type": "string" },
+                "horario": { "type": "string" },
+                "chave": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "ErrorReferenceResponse": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer" },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "code": { "type": "string" },
+                      "status": { "type": ["integer", "null"] },
+                      "message": { "type": "string" },
+                      "category": { "type": "string" },
+                      "solution": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "OkResponse": {
+        "type": "object",
+        "properties": {
+          "ok": { "type": "boolean", "example": true }
+        }
+      },
       "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+        "required": ["error"],
         "type": "object",
         "properties": {
           "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
+            "type": "string",
+            "description": "Mensagem de erro em caixa alta",
+            "example": "TOKEN INVÁLIDO, INATIVO OU EXPIRADO"
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Token ausente",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "HEADER \"X-API-TOKEN\" AUSENTE" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Token inválido ou requisição bloqueada",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "TOKEN INVÁLIDO, INATIVO OU EXPIRADO" }
+          }
+        }
+      },
+      "ValidationError": {
+        "description": "Erro de validação nos campos enviados",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "O CAMPO \"AMOUNT\" É OBRIGATÓRIO E DEVE SER UM NÚMERO POSITIVO EM REAIS (BRL)" }
+          }
+        }
+      },
+      "RateLimitError": {
+        "description": "Limite de requisições excedido",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "LIMITE DE REQUISIÇÕES EXCEDIDO. AGUARDE 60S" }
+          }
+        }
+      },
+      "InternalError": {
+        "description": "Erro interno do servidor",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "error": "ERRO INTERNO DO SERVIDOR" }
           }
         }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-token"
       }
     }
   }
