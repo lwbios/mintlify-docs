@@ -20,6 +20,13 @@
               "quickstart",
               "api-authentication"
             ]
+          },
+          {
+            "group": "Taxas",
+            "pages": [
+              "fees",
+              "fees-table"
+            ]
           }
         ],
         "icon": "rocket-launch"

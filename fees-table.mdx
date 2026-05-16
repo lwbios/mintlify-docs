@@ -1,0 +1,99 @@
+---
+title: "Calculadora de taxas"
+description: "Exemplos passo a passo de como as taxas da Valora são calculadas em cada fluxo de recebimento."
+---
+
+Toda transação registra os campos `fee_pct`, `fee_fixed_brl`, `fee_total_brl`, `net_amount_usdt` e `usd_brl_rate`. Acessíveis via API e visíveis no dashboard. Abaixo estão os cálculos detalhados para cada fluxo.
+
+<Info>
+  Os valores são calculados no momento da confirmação do recebimento — não na criação do pagamento. A cotação `usd_brl_rate` usada é sempre a do momento da confirmação.
+</Info>
+
+---
+
+## Fluxo Pix — cliente paga em BRL
+
+<Tabs>
+  <Tab title="Recebimento de R$ 257,50">
+    ```text
+    Cliente paga via Pix:      R$ 257,50
+    
+    Taxa percentual (0.70%):  -R$   1,80
+    Taxa fixa:                -R$   0,49
+    Total de taxas:           -R$   2,29
+    
+    Saldo líquido em BRL:      R$ 255,21
+    
+    Cotação USD/BRL:           R$ 5,15
+    USDT creditado:            $49,56 USDT → carteira Solana
+    ```
+  </Tab>
+  <Tab title="Recebimento de R$ 515,00">
+    ```text
+    Cliente paga via Pix:      R$ 515,00
+    
+    Taxa percentual (0.70%):  -R$   3,61
+    Taxa fixa:                -R$   0,49
+    Total de taxas:           -R$   4,10
+    
+    Saldo líquido em BRL:      R$ 510,90
+    
+    Cotação USD/BRL:           R$ 5,15
+    USDT creditado:            $99,20 USDT → carteira Solana
+    ```
+  </Tab>
+  <Tab title="Recebimento de R$ 2.575,00">
+    ```text
+    Cliente paga via Pix:      R$ 2.575,00
+    
+    Taxa percentual (0.70%):  -R$  18,03
+    Taxa fixa:                -R$   0,49
+    Total de taxas:           -R$  18,52
+    
+    Saldo líquido em BRL:      R$ 2.556,48
+    
+    Cotação USD/BRL:           R$ 5,15
+    USDT creditado:            $496,40 USDT → carteira Solana
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Fluxo on-chain — cliente paga em USDT
+
+<Tabs>
+  <Tab title="Recebimento de $100 USDT">
+    ```text
+    Pagamento recebido:        $100,00 USDT
+    
+    Taxa (1.0%):               -$1,00 USDT
+    
+    USDT encaminhado:          $99,00 USDT → carteira de destino
+    Taxa de rede Solana:       ~$0,001 (absorvida pela operação)
+    ```
+  </Tab>
+  <Tab title="Recebimento de $500 USDT">
+    ```text
+    Pagamento recebido:        $500,00 USDT
+    
+    Taxa (1.0%):               -$5,00 USDT
+    
+    USDT encaminhado:          $495,00 USDT → carteira de destino
+    Taxa de rede Solana:       ~$0,001 (absorvida pela operação)
+    ```
+  </Tab>
+  <Tab title="$30 USDT — taxa mínima aplicada">
+    ```text
+    Pagamento recebido:        $30,00 USDT
+    
+    1% calculado:              $0,30 USDT
+    Mínimo aplicado:           $0,50 USDT ← mínimo é maior
+    
+    USDT encaminhado:          $29,50 USDT → carteira de destino
+    Taxa de rede Solana:       ~$0,001 (absorvida pela operação)
+    ```
+  </Tab>
+</Tabs>
+
+---

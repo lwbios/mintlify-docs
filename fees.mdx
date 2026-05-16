@@ -1,0 +1,73 @@
+---
+title: "Taxas"
+description: "Duas taxas simples e transparentes. Sem planos, sem contratos, sem mensalidade. Pague só pelo que usar."
+---
+
+## Recebimento via Pix
+
+Seu cliente paga em BRL via Pix. A Valora deduz a taxa sobre o valor recebido em reais, converte o saldo líquido para USDT e credita na sua carteira Solana automaticamente.
+
+No dashboard você vê os dois valores: o montante pago pelo cliente em BRL e o equivalente creditado em USDT, com a cotação do momento registrada em cada transação.
+
+## Recebimento on-chain
+
+Seu cliente paga em USDT direto na Solana. A Valora monitora a transação on-chain, deduz a taxa e encaminha o saldo líquido para a carteira Solana de destino que você configurar. Sem conversão, sem banco.
+
+<Warning>
+  Pagamentos abaixo de \$0.50 USDT aplicam a taxa mínima automaticamente. Para o fluxo Pix, recomendamos configurar um valor mínimo de pagamento no seu checkout.
+</Warning>
+
+## Saques
+
+Saques são automáticos não geram nenhuma taxa adicional. Você solicita quando quiser ou configura um agendamento (diário, semanal ou mensal) — a Valora executa sem cobrar nada a mais. O único custo em saques cripto é a taxa de rede da Solana (aproximadamente \$0.001), que é absorvida pela operação.
+
+<Info>
+  1.0% por transação — mínimo \$0.50 USDT. Cobrado sobre o valor em USDT recebido on-chain, antes do encaminhamento para a carteira de destino.
+</Info>
+
+## Resumo
+
+| Operação | Taxa |
+| --- | --- |
+| Recebimento via Pix | 0.70% \+ R\$ 0.49 |
+| Recebimento on-chain (USDT) | 1.0% — mín. \$0.50 USDT |
+| Saques (Pix ou Cripto) | Incluso |
+| Sandbox / devnet | Sempre gratuito |
+
+## Perguntas frequentes
+
+<AccordionGroup>
+  <Accordion title="Por que a taxa do Pix tem uma parte fixa em reais?">
+    A parte fixa de R\$ 0.49  cobre o custo operacional do processamento Pix e da conversão cambial. A parte percentual de 0.70% é proporcional ao volume. Juntas, elas tornam a Valora competitiva em qualquer tamanho de transação — de R\$ 50 a R\$ 50.000 — sem onerar quem opera em alto volume.
+  </Accordion>
+
+  <Accordion title="A taxa do Pix incide sobre o valor em BRL ou em USDT?">
+    Sobre o valor em BRL recebido via Pix, antes da conversão. A cotação USD/BRL usada é registrada no campo `usd_brl_rate` de cada transação e exibida no dashboard.
+  </Accordion>
+
+  <Accordion title="Quando exatamente a taxa é cobrada?">
+    No momento da confirmação do recebimento — não na criação do pagamento. Se o cliente gerar um pagamento e não pagar, nenhuma taxa é cobrada. Você só paga quando o dinheiro chega de fato.
+  </Accordion>
+
+  <Accordion title="Há taxa sobre saques?">
+    Não. Saques manuais e automáticos não geram nenhuma taxa adicional. O único custo em saques cripto é a taxa de rede da Solana (~\$0.001), absorvida pela operação.
+  </Accordion>
+
+  <Accordion title="Há mensalidade, setup fee ou multa de cancelamento?">
+    Não. Nenhum. Sem planos, sem contratos, sem mínimo mensal, sem penalidade de saída. Você começa de graça no sandbox, vai para produção quando quiser e para quando quiser.
+  </Accordion>
+
+  <Accordion title="A taxa muda conforme o volume?">
+    As taxas listadas aqui são as taxas padrão. Para empresas com volume acima de \$100.000 USDT/mês, entre em contato para discutir condições diferenciadas.
+  </Accordion>
+
+  <Accordion title="O que acontece se a taxa mudar no futuro?">
+    A taxa aplicada fica registrada nos campos `fee_pct` e `fee_fixed_brl` de cada transação. Uma mudança afeta apenas transações futuras — o histórico permanece inalterado e auditável.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+<Card title="Ver como as taxas são calculadas" icon="calculator" href="/pricing/fee-calculator" cta="Ir para calculadora" arrow="true">
+  Exemplos passo a passo com os três cenários mais comuns — Pix, cripto e taxa mínima aplicada.
+</Card>
