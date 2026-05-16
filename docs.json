@@ -57,7 +57,7 @@
       "anchors": [
         {
           "anchor": "Referência da API",
-          "href": "https://mintlify.com/docs",
+          "href": "https://docs.valora.cash/api-reference/introduction",
           "icon": "code",
           "color": {
             "light": "#615fff",
