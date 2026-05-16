@@ -11,48 +11,21 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Comece agora",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Visão geral",
             "pages": [
               "index",
               "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "api-authentication"
             ]
           }
-        ]
+        ],
+        "icon": "rocket-launch"
       },
       {
-        "tab": "API reference",
+        "tab": "Referência da API",
         "groups": [
           {
             "group": "API documentation",
@@ -69,20 +42,29 @@
               "api-reference/endpoint/webhook"
             ]
           }
-        ]
+        ],
+        "icon": "code"
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
+          "anchor": "Referência da API",
           "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "icon": "code",
+          "color": {
+            "light": "#615fff",
+            "dark": "#615fff"
+          }
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Dashboard Valora",
+          "icon": "solar-panel",
+          "color": {
+            "light": "#615fff",
+            "dark": "#615fff"
+          },
+          "href": "https://dash.valora.cash"
         }
       ]
     }
