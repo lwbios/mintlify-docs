@@ -1,33 +1,58 @@
----
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
----
+## URLs de ambiente
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+- Modo ao vivo: https://prod.api.valora.cash/v1/
+- Modo teste: https://test.api.valora.cash/v1/
 
-## Welcome
+## Gerenciamento de chaves de API e autenticação
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
+<Steps>
+  <Step title="Chaves de API de acesso">
+    Acesse o [Dashboard da Valora](https://dash.valora.cash) e faça login.
+  </Step>
+  <Step title="API aberta e webhooks">
+    Acesse a seção API e Webhooks na barra lateral:
 
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+    1. Adicione o URL do seu Webhook — a Valora envia atualizações de status aqui.
+    2. Copie sua chave de API — mantenha-a apenas no servidor, nunca a exponha no código do frontend.
+  </Step>
+  <Step title="Guarde sua chave em segurança.">
+    Copie a chave gerada imediatamente e certifique-se de armazená-la em local seguro.
+  </Step>
+  <Step title="Autentique suas solicitações de API">
+    Utilize suas chaves de API para autenticar todas as solicitações. Aplique o seguinte formato de autorização:
 
-## Authentication
+    ```shellscript
+    'x-api-key: YOUR_API_KEY'
+    ```
+  </Step>
+</Steps>
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+## Limites de taxa
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
+Nossa API utiliza um sistema de limitação de taxa de requisições com janela dupla e proteção contra picos de tráfego. Os limites são aplicados com base no seu método de autenticação e plano de negócios.
+
+### Limites padrões
+
+| **Endpoint** | Limite | **Janela** |
+| --- | --- | --- |
+| `GET` | 30 req | 60s |
+| `POST` | 30 req | 60s |
+
+## Tratamento de erros
+
+Para gerenciar erros de forma eficaz, consulte as seções _Códigos de Erro_ e _Falhas de Transação_ para obter orientações detalhadas.
+
+<Columns cols={2}>
+  <Column>
+    <Card title="Códigos de erro" icon="triangle-exclamation" href="/erro-codes">
+      Explore os detalhes completos dos erros e suas soluções.
+    </Card>
+  </Column>
+  <Column>
+    <Card title="Falhas de transação" icon="brake-warning" href="/transaction-failures">
+      Obtenha informações sobre problemas comuns em transações e suas soluções.
+    </Card>
+  </Column>
+</Columns>
+
+## Webhooks

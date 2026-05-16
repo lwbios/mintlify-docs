@@ -1,0 +1,36 @@
+---
+title: "Falhas na transação"
+---
+
+Saiba mais sobre os diferentes motivos de falha em transações e como lidar com eles na API de pagamentos da Dodo.
+
+## **Visão geral**
+
+A API de Pagamentos da Valora fornece motivos detalhados para falhas de transação, ajudando você a entender por que uma tentativa de pagamento não foi bem-sucedida. Esses motivos são padronizados para diferentes métodos e provedores de pagamento, facilitando a implementação de um tratamento de erros consistente em sua aplicação.Cada resposta a uma falha de transação inclui:
+
+- Um código específico de motivo da falha
+- Uma mensagem de erro legível para humanos
+- Informações adicionais sobre a falha, quando disponíveis.
+- Se o erro pode ser corrigido pelo usuário ou se requer intervenção do sistema.
+
+Compreender essas razões para as falhas é crucial para:
+
+- Fornecer feedback claro aos seus clientes
+- Implementar lógica de repetição apropriada
+- Lidar com diferentes cenários de falha de forma elegante
+- Manter um sistema de processamento de pagamentos confiável.
+
+## [**​**](https://docs.dodopayments.com/api-reference/transaction-failures#transaction-failure-reasons)
+
+## Motivos para falha na transação
+
+A tabela a seguir lista todos os possíveis motivos de falha de transação, seus significados e se são erros que podem ser corrigidos pelo usuário.
+
+| Código | Status | **Causa** | Solução |
+| --- | --- | --- | --- |
+| `PIX_INVALID_NETWORK` | `422` | Rede não suportada | Use `"network": "solana"` |
+| `PIX_INVALID_TOKEN` | `422` | Token inválido para a rede | Use `"token": "usdt"` |
+| `PIX_EXPIRED` |  | QR Code não pago em 30 min | Crie nova cobrança |
+| `CRYPTO_UNSUPPORTED_ASSET` | `422` | Asset inválido na rota | Use `usdt` ou `usdc` |
+| `CRYPTO_PAYMENT_EXPIRED` |  | 30 min sem confirmação | <br />Crie novo pagamento |
+| `CRYPTO_TX_FAILED_ON_CHAIN` |  | <br />Transação rejeitada pela Solana | Causa mais comum: SOL insuficiente para taxa (~0.000005 SOL) |

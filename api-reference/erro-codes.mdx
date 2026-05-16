@@ -1,0 +1,53 @@
+---
+title: "Códigos de erro"
+---
+
+Saiba mais sobre códigos de erro e como resolvê-los na API de pagamentos da Valora
+
+## Visão geral
+
+A API de pagamentos da Valora utiliza códigos de status HTTP padrão e códigos de erro personalizados para indicar o sucesso ou a falha das solicitações da API. Quando ocorre um erro, a API retorna um código de status HTTP apropriado e uma resposta JSON contendo informações detalhadas sobre o erro. Cada resposta de erro inclui:
+
+- Um código de status HTTP que indica a categoria geral do erro.
+- Um código de erro específico que identifica a natureza exata do erro.
+- Uma mensagem de erro legível para humanos explicando o que deu errado.
+- Detalhes adicionais sobre o erro, quando aplicável.
+
+Compreender esses códigos de erro e seus significados é crucial para:
+
+- Depuração de problemas de integração
+- Implementar um tratamento de erros adequado em sua aplicação.
+- Fornecer feedback significativo aos usuários finais.
+- Manter um sistema robusto de processamento de pagamentos.
+
+As seções a seguir fornecem informações detalhadas sobre os códigos de status HTTP padrão e os códigos de erro específicos que você pode encontrar ao usar a API de Pagamentos da Valora
+
+## Códigos de erro padrão da API
+
+| Código | Status | Causa | Solução |
+| --- | --- | --- | --- |
+| `AUTH_MISSING_TOKEN` | `401` | Header `x-api-token` não enviado | Inclua o header em todas as requisições |
+| `AUTH_INVALID_TOKEN` | `403` | Token errado, inativo ou expirado | Verifique o token ou gere um novo |
+| `RATE_LIMIT_EXCEEDED` | `429` | Mais de 30 req/min (POST) ou 60 req/min (GET) | Aguarde a janela de 60s |
+| `REQUEST_BLOCKED` | `403` | User-Agent de scanner ou padrão de SQLi/XSS no body | Verifique o conteúdo enviado |
+| `INVALID_AMOUNT` | `422` | `amount` ausente, zero ou negativo | Envie `{ "amount": 50.00 }` |
+| `AMOUNT_BELOW_MINIMUM` | `422` | Valor abaixo de R\$ 1,00 | Mínimo é R\$ 1,00 |
+| `INTERNAL_SERVER_ERROR` | `500` | Erro do Servidor Interno | <br />O servidor recebeu uma resposta inválida de um servidor upstream. |
+
+## Formato da resposta de erro
+
+Quando ocorre um erro, a API retorna uma resposta JSON com a seguinte estrutura:
+
+```json
+{
+	 "error": "TOKEN INVÁLIDO, INATIVO OU EXPIRADO"
+}
+```
+
+## Melhores práticas
+
+1. Em sua aplicação, sempre lide com erros de forma adequada.
+2. Implemente um sistema de registro de erros adequado.
+3. Utilize mensagens de erro apropriadas para os usuários finais.
+4. Implemente uma lógica de repetição para erros transitórios.
+5. Contate o suporte para problemas não resolvidos.

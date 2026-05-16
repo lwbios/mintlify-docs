@@ -1,0 +1,63 @@
+---
+title: "Webhooks"
+---
+
+Receba notificações em tempo real quando eventos ocorrerem na Valora. Automatize fluxos de trabalho e mantenha seus sistemas sincronizados com a entrega instantânea de eventos.
+
+Os webhooks fornecem notificações em tempo real quando eventos específicos ocorrem na sua conta Valora. Use webhooks para automatizar fluxos de trabalho, atualizar seu banco de dados, enviar notificações e manter seus sistemas sincronizados.
+
+## Principais características
+
+<Columns cols={2}>
+  <Column>
+    <Card title="Entrega em tempo real" icon="bolt-lightning">
+      Receba notificações instantâneas quando ocorrerem eventos.
+    </Card>
+  </Column>
+  <Column>
+    <Card title="Segurança garantida por padrão" icon="shield-check">
+      Verificação de assinatura HMAC SHA256 incluída
+    </Card>
+  </Column>
+</Columns>
+
+<Columns cols={2}>
+  <Column>
+    <Card title="Tentativas automáticas" icon="arrows-repeat">
+      Lógica de repetição integrada com recuo exponencial.
+    </Card>
+  </Column>
+  <Column>
+    <Card title="Filtragem de eventos" icon="filter">
+      Inscreva-se apenas nos eventos de que precisa.
+    </Card>
+  </Column>
+</Columns>
+
+## Começando
+
+<Steps>
+  <Step title="Acessar configurações de webhook">
+    Acesse o painel o dasboard do Valora e vá para `Developers > Webhooks`.
+  </Step>
+  <Step title="Criar ponto de extremidade do Webhook">
+    Clique `Criar novo disparo`  para criar um novo ponto de extremidade de webhook.
+  </Step>
+  <Step title="Adicionar URL de endpoint">
+    Insira a URL onde deseja receber eventos de webhook.
+  </Step>
+  <Step title="Selecione os eventos que deseja receber">
+    Escolha os eventos específicos que seu endpoint de webhook deve monitorar, selecionando-os na lista de eventos
+
+    <Tip>
+      Somente eventos selecionados acionarão webhooks para seu endpoint, ajudando você a evitar tráfego e processamento desnecessários.
+    </Tip>
+  </Step>
+  <Step title="Obtenha a chave secreta">
+    Obtenha seu webhook `Secret Key`na página de configurações. Você o usará para verificar a autenticidade dos webhooks recebidos.
+
+    <Warning>
+      Mantenha a chave secreta do seu webhook em segurança e nunca a exponha no código do lado do cliente ou em repositórios públicos.
+    </Warning>
+  </Step>
+</Steps>
