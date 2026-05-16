@@ -138,5 +138,8 @@
   "fonts": {
     "family": "Inter",
     "format": "woff2"
+  },
+  "api": {
+    "openapi": "openapi.json"
   }
 }
