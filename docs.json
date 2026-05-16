@@ -25,7 +25,7 @@
             "group": "Taxas",
             "pages": [
               "fees",
-              "fees-table"
+              "fees-calculator"
             ]
           }
         ],
