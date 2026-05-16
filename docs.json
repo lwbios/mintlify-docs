@@ -27,6 +27,17 @@
               "fees",
               "fees-calculator"
             ]
+          },
+          {
+            "group": "Variado",
+            "pages": [
+              {
+                "group": "Canais de suporte",
+                "pages": [
+                  "help-support"
+                ]
+              }
+            ]
           }
         ],
         "icon": "rocket-launch"
@@ -88,12 +99,7 @@
   },
   "logo": "/logo/light.svg",
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
+    "links": [],
     "primary": {
       "type": "button",
       "label": "Dashboard",
