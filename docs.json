@@ -54,6 +54,13 @@
           }
         ],
         "icon": "code"
+      },
+      {
+        "tab": "Projetos comunitários",
+        "icon": "people-line",
+        "pages": [
+          "overview"
+        ]
       }
     ],
     "global": {
