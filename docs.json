@@ -123,5 +123,9 @@
   "appearance": {
     "default": "light",
     "strict": true
+  },
+  "fonts": {
+    "family": "Inter",
+    "format": "woff2"
   }
 }
