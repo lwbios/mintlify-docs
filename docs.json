@@ -60,9 +60,9 @@
               {
                 "group": "Solana",
                 "pages": [
-                  "create-mdx",
-                  "get-asset-sol",
-                  "asse-create-mdx"
+                  "payment-sol",
+                  "get-spl-sol",
+                  "payment-spl-sol"
                 ]
               }
             ]
@@ -70,7 +70,7 @@
           {
             "group": "Pix",
             "pages": [
-              "create-mdx-1"
+              "payment-pix"
             ]
           }
         ],
