@@ -65,7 +65,9 @@
             "pages": [
               {
                 "group": "Solana",
-                "pages": []
+                "pages": [
+                  "create-mdx"
+                ]
               }
             ]
           }
