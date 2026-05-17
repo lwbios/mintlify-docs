@@ -188,7 +188,7 @@
         }
       }
     },
-    "/v1/coins/sol/{asset}/{txid}": {
+    "/v1/coins/sol/{asset}/{reference}": {
       "get": {
         "summary": "Consultar status de pagamento crypto",
         "description": "Verifica se um pagamento Solana foi confirmado na blockchain. Retorna 200 se confirmado, 202 se ainda pendente. Consulta primeiro o store em memória (instantâneo) e faz fallback no RPC da Solana se o servidor tiver reiniciado.",

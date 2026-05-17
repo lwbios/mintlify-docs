@@ -183,7 +183,7 @@
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "422": { "$ref": "#/components/responses/ValidationError" },
-          "429": { "$ref": "#/components/responses/RateLimitError" },
+      reference"429": { "$ref": "#/components/responses/RateLimitError" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }

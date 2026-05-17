@@ -55,20 +55,22 @@
             ]
           },
           {
-            "group": "Pix",
-            "pages": [
-              "api-reference/endpoint/create.mdx"
-            ]
-          },
-          {
             "group": "Crypto",
             "pages": [
               {
                 "group": "Solana",
                 "pages": [
-                  "create-mdx"
+                  "create-mdx",
+                  "get-asset-sol",
+                  "asse-create-mdx"
                 ]
               }
+            ]
+          },
+          {
+            "group": "Pix",
+            "pages": [
+              "create-mdx-1"
             ]
           }
         ],
