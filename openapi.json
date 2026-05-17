@@ -183,12 +183,12 @@
           "401": { "$ref": "#/components/responses/Unauthorized" },
           "403": { "$ref": "#/components/responses/Forbidden" },
           "422": { "$ref": "#/components/responses/ValidationError" },
-      reference"429": { "$ref": "#/components/responses/RateLimitError" },
+          "429": { "$ref": "#/components/responses/RateLimitError" },
           "500": { "$ref": "#/components/responses/InternalError" }
         }
       }
     },
-    "/v1/coins/sol/{asset}/{txid}": {
+    "/v1/coins/sol/{asset}/{reference}": {
       "get": {
         "summary": "Consultar status de pagamento crypto",
         "description": "Verifica se um pagamento Solana foi confirmado na blockchain. Retorna 200 se confirmado, 202 se ainda pendente. Consulta primeiro o store em memória (instantâneo) e faz fallback no RPC da Solana se o servidor tiver reiniciado.",
@@ -260,87 +260,6 @@
           "422": { "$ref": "#/components/responses/ValidationError" },
           "429": { "$ref": "#/components/responses/RateLimitError" },
           "500": { "$ref": "#/components/responses/InternalError" }
-        }
-      }
-    },
-    "/v1/help/transactions": {
-      "get": {
-        "summary": "Referência de erros e falhas em transações",
-        "description": "Retorna a lista completa de códigos de erro, causas e soluções para problemas comuns em transações PIX e crypto. Não requer autenticação.",
-        "tags": ["Utilitários"],
-        "security": [],
-        "responses": {
-          "200": {
-            "description": "Referência de erros agrupada por categoria",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorReferenceResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/pix/webhook": {
-      "get": {
-        "summary": "Ping do webhook PIX (Efi Bank)",
-        "description": "Endpoint exclusivo para verificação da Efi Bank ao registrar o webhook. Não use diretamente.",
-        "tags": ["Interno"],
-        "security": [],
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "description": "Secret do webhook (EFI_WEBHOOK_SECRET)",
-            "schema": { "type": "string" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Ping aceito",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/OkResponse" }
-              }
-            }
-          },
-          "401": { "$ref": "#/components/responses/Unauthorized" }
-        }
-      },
-      "post": {
-        "summary": "Notificação de PIX confirmado (Efi Bank)",
-        "description": "Recebido automaticamente pela Efi Bank quando um pagamento PIX é confirmado. Não use diretamente.",
-        "tags": ["Interno"],
-        "security": [],
-        "parameters": [
-          {
-            "name": "token",
-            "in": "query",
-            "required": true,
-            "description": "Secret do webhook (EFI_WEBHOOK_SECRET)",
-            "schema": { "type": "string" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/EfiWebhookBody" }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Sempre retorna 200 para evitar retentativas da Efi",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/OkResponse" }
-              }
-            }
-          }
         }
       }
     }
@@ -819,7 +738,7 @@
       "apiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "x-api-token"
+        "name": "x-api-key"
       }
     }
   }
