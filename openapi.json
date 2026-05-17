@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "https://prod.api.valora.cash",
+      "urllivehttps://prod.api.valora.cash",
       "description": "Produção"
     },
     {
