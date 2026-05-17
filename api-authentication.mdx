@@ -28,15 +28,15 @@ Segue um exemplo de uma requisição autenticada para o `pixQrCode` endpoint:
 
 ```shellscript
 curl --request POST \
-     --url https://prod.api.valora.cash/v1/pixQrCode/ \
-     --header 'accept: application/json' \
-     --header 'content-type: application/json' \
-     --header 'x-api-key: YOUR_API_KEY' \
-     --data '
+  --url https://prod.api.valora.cash/v1/pixQrCode \
+  --header 'Content-Type: application/json' \
+  --header 'x-api-key: <api-key>' \
+  --data '
 {
-  "amount": "1"
+  "amount": 50,
+  "network": "solana",
+  "token": "usdt"
 }
-'
 ```
 
 ## Tratamento de erros
