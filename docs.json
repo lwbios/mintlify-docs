@@ -113,7 +113,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://dash.valora.cash"
     }
   },
   "contextual": {
