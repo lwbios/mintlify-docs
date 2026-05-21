@@ -143,6 +143,8 @@
     "format": "woff2"
   },
   "api": {
-    "openapi": "openapi.json"
+    "openapi": {
+      "source": "openapi.json"
+    }
   }
 }

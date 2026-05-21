@@ -14,7 +14,7 @@
       "description": "Produção"
     },
     {
-  s   test.api.valora.cash//localhost:3000",
+      "url": "https://test.api.valora.cash",
       "description": "Desenvolvimento"
     }
   ],
@@ -275,7 +275,8 @@
             "application/json": {
               "schema": { "$ref": "#/components/schemas/WebhookPaymentCreated" }
             }
-          }a Valora},
+          }
+        },
         "responses": {
           "200": { "description": "Webhook recebido com sucesso" }
         }
@@ -284,7 +285,7 @@
     "payment.confirmed": {
       "post": {
         "summary": "Pagamento confirmado",
-        "description": "Disparado quando um PIX é confirmado pela Efi Bank ou uma transação crypto é detectada na blockchain.",
+        "description": "Disparado quando um PIX é confirmado pela Valora ou uma transação crypto é detectada na blockchain.",
         "tags": ["Webhooks"],
         "requestBody": {
           "content": {
@@ -351,7 +352,7 @@
             "enum": ["solana"],
             "example": "solana"
           },
-          Valora {
+          "token": {
             "type": "string",
             "description": "Token de destino",
             "enum": ["usdt"],
@@ -364,7 +365,7 @@
         "properties": {
           "txid": {
             "type": "string",
-            "description": "ID da cobrança na Efi Bank"
+            "description": "ID da cobrança na Valora"
           },
           "status": {
             "type": "string",

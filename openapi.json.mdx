@@ -10,11 +10,11 @@
   },
   "servers": [
     {
-      "url": "https://prod.api.valora.cash",
+      "url": "https://live.api.valora.cash",
       "description": "Produção"
     },
     {
-      "url": "http://localhost:3000",
+  s   test.api.valora.cash//localhost:3000",
       "description": "Desenvolvimento"
     }
   ],
@@ -268,15 +268,15 @@
     "payment.created": {
       "post": {
         "summary": "Pagamento criado",
-        "description": "Disparado quando um QR Code PIX ou pagamento crypto é gerado com sucesso.",
+        "description": "Disparado quando um QR C
+          ou pagamento crypto é gerado com sucesso.",
         "tags": ["Webhooks"],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": { "$ref": "#/components/schemas/WebhookPaymentCreated" }
             }
-          }
-        },
+          }a Valora},
         "responses": {
           "200": { "description": "Webhook recebido com sucesso" }
         }
@@ -352,7 +352,7 @@
             "enum": ["solana"],
             "example": "solana"
           },
-          "token": {
+          Valora {
             "type": "string",
             "description": "Token de destino",
             "enum": ["usdt"],
@@ -739,38 +739,6 @@
         "type": "apiKey",
         "in": "header",
         "name": "x-api-key"
-      }
-    }
-  }
-}
-MOUNT\" É OBRIGATÓRIO E DEVE SER UM NÚMERO POSITIVO EM REAIS (BRL)" }
-          }
-        }
-      },
-      "RateLimitError": {
-        "description": "Limite de requisições excedido",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "example": { "error": "LIMITE DE REQUISIÇÕES EXCEDIDO. AGUARDE 60S" }
-          }
-        }
-      },
-      "InternalError": {
-        "description": "Erro interno do servidor",
-        "content": {
-          "application/json": {
-            "schema": { "$ref": "#/components/schemas/Error" },
-            "example": { "error": "ERRO INTERNO DO SERVIDOR" }
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "apiKeyAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "x-api-token"
       }
     }
   }
