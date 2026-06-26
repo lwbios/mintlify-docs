@@ -21,6 +21,36 @@
               "api-reference/transaction-failures",
               "api-reference/webhooks"
             ]
+          },
+          {
+            "group": "Pagamentos",
+            "pages": [
+              "post",
+              "buscar-pagamento",
+              "atualizar-pagamento"
+            ]
+          },
+          {
+            "group": "Checkouts",
+            "pages": [
+              "criar-checkout",
+              "buscar-checkout"
+            ]
+          },
+          {
+            "group": "Clientes",
+            "pages": [
+              "criar-cliente",
+              "buscar-cliente"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "criar-webhook",
+              "buscar-webhook",
+              "deletar-webhook"
+            ]
           }
         ],
         "icon": "code"
