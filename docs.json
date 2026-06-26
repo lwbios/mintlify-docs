@@ -11,38 +11,6 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Comece agora",
-        "groups": [
-          {
-            "group": "Visão geral",
-            "pages": [
-              "index",
-              "quickstart",
-              "api-authentication"
-            ]
-          },
-          {
-            "group": "Taxas",
-            "pages": [
-              "fees",
-              "fees-calculator"
-            ]
-          },
-          {
-            "group": "Variado",
-            "pages": [
-              {
-                "group": "Canais de suporte",
-                "pages": [
-                  "help-support"
-                ]
-              }
-            ]
-          }
-        ],
-        "icon": "rocket-launch"
-      },
-      {
         "tab": "Referência da API",
         "groups": [
           {
@@ -52,25 +20,6 @@
               "api-reference/erro-codes",
               "api-reference/transaction-failures",
               "api-reference/webhooks"
-            ]
-          },
-          {
-            "group": "Crypto",
-            "pages": [
-              {
-                "group": "Solana",
-                "pages": [
-                  "payment-sol",
-                  "get-spl-sol",
-                  "payment-spl-sol"
-                ]
-              }
-            ]
-          },
-          {
-            "group": "Pix",
-            "pages": [
-              "payment-pix"
             ]
           }
         ],
@@ -143,8 +92,6 @@
     "format": "woff2"
   },
   "api": {
-    "openapi": {
-      "source": "openapi.json"
-    }
+    "openapi": "openapi.json"
   }
 }

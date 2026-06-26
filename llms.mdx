@@ -1,0 +1,392 @@
+# Valora Payment Gateway API
+
+> Valora is a Brazilian payment gateway API. It lets businesses accept payments via PIX (Brazil's instant payment system) and cryptocurrency (USDT, USDC, EURC on Solana). This document contains everything an AI assistant needs to integrate with Valora correctly.
+
+## Quick reference
+
+- Base URL: `https://api.valorapayments.com.br`
+- Auth header: `x-api-key: YOUR_API_KEY` (required on every request except /llms.txt)
+- OpenAPI spec: `GET https://api.valorapayments.com.br/openapi.json`
+- Rate limit: 60 requests per minute per API key
+
+## CRITICAL: Amount convention
+
+This is the most common integration mistake. The API uses two different representations:
+
+- **Request bodies**: amounts in **centavos** (integer). `5000` = R\$50,00
+- **Response bodies**: amounts in **BRL** (float). `50.0` = R\$50,00
+
+Always multiply BRL by 100 when sending, divide centavos by 100 when reading.
+
+```text
+R$50,00 → send 5000 → receive 50.0
+R$1,99  → send 199  → receive 1.99
+```
+
+## Authentication
+
+All `/v1/*` routes require the header:
+
+```text
+x-api-key: YOUR_API_KEY
+```
+
+Unauthorized requests return:
+
+```json
+{ "error": { "code": "UNAUTHORIZED", "message": "..." } }
+```
+
+## Error format
+
+All errors use this envelope:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message in Portuguese"
+  }
+}
+```
+
+Common error codes:
+
+- `MISSING_FIELDS` (422) — required fields not sent
+- `INVALID_FIELD` (422) — field value is invalid
+- `INVALID_STATUS` (422) — operation not allowed in current payment status
+- `NO_FEE_RULE` (422) — payment method not configured for this account
+- `UNSUPPORTED_PAYMENT_METHOD` (422) — unknown payment\_method value
+- `NOT_FOUND` (404) — resource does not exist
+- `FORBIDDEN` (403) — resource belongs to another account
+- `RATE_LIMITED` (429) — exceeded 60 req/min, retry after a few seconds
+- `INTERNAL_ERROR` (500) — server error, retry with exponential backoff
+
+## Creating a PIX payment
+
+PIX is Brazil's instant payment system. The customer scans a QR Code and pays in BRL. The status changes to `paid` automatically via webhook when the payment is confirmed.
+
+**Request**
+
+```http
+POST /v1/payments
+x-api-key: YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "payment_method": "pix",
+  "amount": 5000,
+  "currency": "BRL",
+  "metadata": "{\"order_id\": \"ord_123\"}"
+}
+```
+
+**Response 201**
+
+```json
+{
+  "payment_id": "pay_3f1a8b2c-4d5e",
+  "amount": 50.0,
+  "status": "processing",
+  "fee_brl": 1.5,
+  "net_amount_brl": 48.5,
+  "pix": {
+    "qr_code": "data:image/png;base64,iVBORw0KGgo...",
+    "copia_e_cola": "00020101021226770014br.gov.bcb.pix..."
+  },
+  "expires_at": "2026-06-26T13:00:00.000Z"
+}
+```
+
+Show `pix.qr_code` as an image for the customer to scan, or `pix.copia_e_cola` as text to copy-paste in their banking app. PIX payments expire in 60 minutes.
+
+**PIX flow**
+
+1. POST /v1/payments → status: `processing`
+2. Customer scans QR and pays
+3. Valora receives confirmation from EFI bank
+4. Webhook `payment.confirmed` fires → status: `paid`
+
+## Creating a crypto payment (Solana)
+
+Supported tokens: `usdt`, `usdc`, `eurc` on the Solana blockchain.
+
+**Request**
+
+```http
+POST /v1/payments
+x-api-key: YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "payment_method": "crypto",
+  "amount": 5000,
+  "currency": "BRL",
+  "crypto": {
+    "currency": "usdt",
+    "network": "solana"
+  }
+}
+```
+
+**Response 201**
+
+```json
+{
+  "payment_id": "pay_9e2c7d1a-5f6b",
+  "amount": 50.0,
+  "status": "pending",
+  "fee_brl": 1.5,
+  "net_amount_brl": 48.5,
+  "payment_method": "crypto",
+  "crypto": {
+    "currency": "USDT",
+    "network": "solana",
+    "qr_code": "data:image/png;base64,iVBORw0KGgo...",
+    "payment_link": "solana:BJ26ofuu...?amount=9.12&spl-token=Es9vMF...",
+    "wallet_address": "BJ26ofuuKFJwvBmwiN2mSUeBiNEUhi5xjSkAockDA86q",
+    "amount": 9.123456,
+    "expires_at": "2026-06-26T13:30:00.000Z"
+  }
+}
+```
+
+- `crypto.payment_link` — open in Phantom, Solflare or any Solana Pay wallet
+- `crypto.qr_code` — QR Code of the payment\_link
+- `crypto.wallet_address` — raw Solana address if the wallet doesn't support Solana Pay
+- `crypto.amount` — exact token amount (already converted from BRL at current rate)
+
+Crypto payments expire in **30 minutes** if unconfirmed.
+
+**Crypto flow**
+
+1. POST /v1/payments → status: `pending`
+2. Customer opens payment\_link in Solana wallet and approves
+3. Valora detects the on-chain transaction
+4. Webhook `payment.confirmed` fires → status: `paid`
+5. If no payment in 30min: webhook `payment.expired` fires → status: `expired`
+
+## Checking payment status
+
+```http
+GET /v1/payments/{payment_id}
+x-api-key: YOUR_API_KEY
+```
+
+**Response 200**
+
+```json
+{
+  "payment_id": "pay_3f1a8b2c-4d5e",
+  "transaction_id": "txid_...",
+  "business_id": "biz_...",
+  "method": "pix",
+  "status": "paid",
+  "amount_brl": 50.0,
+  "external_id": "...",
+  "created_at": "2026-06-26T12:00:00.000Z",
+  "updated_at": "2026-06-26T12:05:00.000Z"
+}
+```
+
+Payment statuses:
+
+- `pending` — created, awaiting action
+- `processing` — PIX QR generated, awaiting customer payment
+- `paid` — confirmed and credited
+- `failed` — processing error
+- `expired` — timed out (crypto only, 30min)
+- `cancelled` — cancelled
+
+## Updating a payment
+
+You can update `amount` or `metadata` of a payment with status `pending` or `processing`.
+
+- For PIX: updates the EFI charge and generates a new QR Code
+- For crypto: generates a new Solana Pay address with the new amount
+
+```http
+PATCH /v1/payments/{payment_id}
+x-api-key: YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "amount": 7500,
+  "metadata": "{\"order_id\": \"ord_456\"}"
+}
+```
+
+## Setting up webhooks
+
+Register a HTTPS endpoint to receive payment events automatically. This is the recommended way to track payment status changes — polling GET /v1/payments is less reliable.
+
+**Create webhook**
+
+```http
+POST /v1/webhook
+x-api-key: YOUR_API_KEY
+Content-Type: application/json
+
+{
+  "url": "https://yoursite.com/webhooks/valora",
+  "events": ["payment.confirmed", "payment.failed", "payment.expired"]
+}
+```
+
+**Response 201**
+
+```json
+{
+  "webhook_id": "wh_a1b2c3d4",
+  "url": "https://yoursite.com/webhooks/valora",
+  "events": ["payment.confirmed", "payment.failed", "payment.expired"],
+  "status": "active",
+  "created_at": "2026-06-26T12:00:00.000Z"
+}
+```
+
+Available events: `payment.created`, `payment.confirmed`, `payment.expired`, `payment.failed`
+
+### Webhook signature verification
+
+Every webhook request includes `x-valora-signature` header with an HMAC-SHA256 of the raw request body, signed with your webhook's `secret`.
+
+```js
+import { createHmac } from "node:crypto"
+
+function verifyWebhook(rawBody, signature, secret) {
+  const expected = createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex")
+  return signature === expected
+}
+
+// In your Express handler:
+app.post("/webhooks/valora", express.raw({ type: "application/json" }), (req, res) => {
+  const sig = req.headers["x-valora-signature"]
+  if (!verifyWebhook(req.body, sig, process.env.VALORA_WEBHOOK_SECRET)) {
+    return res.status(401).send("Invalid signature")
+  }
+  const event = JSON.parse(req.body)
+  // handle event
+  res.sendStatus(200)
+})
+```
+
+### Webhook event format
+
+All events use this envelope:
+
+```json
+{
+  "event": "payment.confirmed",
+  "timestamp": "2026-06-26T12:05:00.000Z",
+  "data": { ... }
+}
+```
+
+**payment.confirmed** data:
+
+```json
+{
+  "payment_id": "pay_3f1a8b2c-4d5e",
+  "method": "pix",
+  "amount": 50.0,
+  "fee": 1.5,
+  "net_amount": 48.5,
+  "confirmed_at": "2026-06-26T12:05:00.000Z",
+  "pix_end_to_end_id": "E00000000202606261205..."
+}
+```
+
+**payment.failed** data:
+
+```json
+{
+  "payment_id": "pay_3f1a8b2c-4d5e",
+  "method": "crypto",
+  "failure_code": "TransactionError",
+  "failure_reason": "Insufficient SOL for transaction fee"
+}
+```
+
+**payment.expired** data:
+
+```json
+{
+  "payment_id": "pay_9e2c7d1a-5f6b",
+  "method": "crypto",
+  "amount_brl": 50.0,
+  "expired_at": "2026-06-26T12:30:00.000Z"
+}
+```
+
+Valora retries failed webhook deliveries with exponential backoff: 5s, 30s, 2min, 10min.
+
+## Managing webhooks
+
+```http
+GET    /v1/webhook            # list all webhooks
+GET    /v1/webhook/{id}       # get one webhook
+PATCH  /v1/webhook/{id}       # update url / events / status
+DELETE /v1/webhook/{id}       # delete webhook
+```
+
+Temporarily disable a webhook without deleting it:
+
+```http
+PATCH /v1/webhook/{id}
+{ "status": "inactive" }
+```
+
+## Customers
+
+Customers are optional but useful for associating payments to end users.
+
+```http
+POST /v1/customers
+{
+  "email": "customer@example.com",
+  "phone_number": "11999990000",
+  "document_number": "12345678901",
+  "ip": "192.168.1.1",
+  "metadata": "{\"internal_user_id\": \"user_789\"}"
+}
+```
+
+```http
+GET /v1/customers              # list customers
+GET /v1/customers/{id}         # get one customer
+```
+
+## Checkouts
+
+A checkout links a product to a hosted payment page. The page is accessible via a shareable URL with the checkout's slug.
+
+```http
+POST /v1/checkouts
+{
+  "product_id": "prod_abc123",
+  "return_url": "https://yoursite.com/thank-you",
+  "cancel_url": "https://yoursite.com/cancelled",
+  "title": "Premium Plan",
+  "slug": "premium-plan"
+}
+```
+
+```http
+GET /v1/checkouts              # list checkouts
+GET /v1/checkouts/{id}         # get checkout + session history
+```
+
+## Implementation checklist
+
+When integrating Valora, ensure:
+
+- Amounts are always sent as centavos (integers), not BRL
+- Webhook endpoint returns HTTP 200 quickly (process async)
+- Webhook signature is verified on every request
+- Payment status is read from webhooks, not just polling
+- Expired crypto payments prompt the user to create a new payment
+- Failed payments surface a user-friendly error message
+- Idempotency: if the same webhook fires twice (retries), handle it gracefully (check payment status before acting)
