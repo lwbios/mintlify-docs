@@ -6,12 +6,12 @@
     "version": "1.0.0",
     "contact": {
       "name": "Suporte Valora",
-      "url": "https://valora.cash"
+      "url": "https://valorapayments.com.br"
     }
   },
   "servers": [
-    { "url": "https://live.api.valora.cash", "description": "Produção" },
-    { "url": "https://test.api.valora.cash", "description": "Sandbox" }
+    { "url": "https://api.valorapayments.com.br", "description": "Produção" },
+    { "url": "https://sandbox.api.valorapayments.com.br", "description": "Sandbox" }
   ],
   "security": [{ "ApiKey": [] }],
   "paths": {
