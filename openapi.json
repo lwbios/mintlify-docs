@@ -29,14 +29,14 @@
               "examples": {
                 "pix": {
                   "summary": "Pagamento PIX de R$50,00",
-                  "value": { "payment_method": "pix", "amount": 5000, "currency": "BRL" }
+                  "value": { "payment_method": "pix", "amount": 5000, "currency": "brl" }
                 },
                 "crypto": {
                   "summary": "Pagamento cripto USDT de R$50,00",
                   "value": {
                     "payment_method": "crypto",
                     "amount": 5000,
-                    "currency": "BRL",
+                    "currency": "brl",
                     "crypto": { "currency": "usdt", "network": "solana" }
                   }
                 }
